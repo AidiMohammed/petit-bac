@@ -26,10 +26,16 @@ function Signup(props)
         if(password !== confirmPassword)
         {
             setUserInfo({...userInfo,error: "Les mots de passe saisis ne sont pas identiques"});
+            return;
         }
 
         firebase.signupUser(email,password)
         .then(user => {
+            firebase.user(user.user.uid).set({
+                username,
+                email,
+                contactes: []
+            })
             setUserInfo(initialState);
             props.history.push("/profile")
         })
