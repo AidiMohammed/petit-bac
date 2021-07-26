@@ -3,9 +3,9 @@ import {firebaseContexte} from '../Firebase/'
 import {Link} from 'react-router-dom';
 
 
-function Login() 
+function Login(props) 
 {
-    /*const firbase = useContext(firebaseContexte)*/
+    const firebase = useContext(firebaseContexte)
 
     const initialState = {
         email: "",
@@ -14,11 +14,23 @@ function Login()
     }
     const [infoLogin, setInfoLogin] = useState(initialState);
 
+    const {email,password,error} = infoLogin;
+
     const submitForm = (e) =>
     {
         e.preventDefault()
-        console.log(infoLogin)
+        firebase.loginUser(email,password)
+        .then(user => {
+            console.log("USER : ",user)
+            props.history.push("/profile")
+        })
+        .catch(err => setInfoLogin({...infoLogin,error: err.message}))
+
+        console.log("INFO LOGIN : ",infoLogin)
     }
+
+
+    const messageError = error && <h1>{error}</h1>
 
     return (
         <div>
@@ -32,7 +44,9 @@ function Login()
                 <input value = {infoLogin.password} onChange = {e => setInfoLogin({...infoLogin,[e.target.name]: e.target.value})} type="password" name= "password"/>
 
                 <button type='submit'>Connexion</button>
+                <Link to ="/forgetPassword">mot de passe oublié ?</Link> 
             </form>
+            {messageError}
             <Link to ="/signup"><h3>Vous étes nouveau ici ? Inscrivez-vous maintenant.</h3></Link>
         </div>
     )

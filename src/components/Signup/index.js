@@ -61,7 +61,7 @@ function Signup(props)
 
                 <button type="submit">S'inscrire</button>
 
-                <Link to ='/login'>Connectez-vous</Link>
+                <Link to ='/login'>vous êtes déjà membre connectez-vous</Link>
 
                 {messageError}
             </form>

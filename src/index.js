@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import Fairebase,{firebaseContexte} from './components/Firebase' 
 ReactDOM.render(
-  <firebaseContexte.Provider value = {new Fairebase}> 
     <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  </firebaseContexte.Provider>,
+      <firebaseContexte.Provider value = {new Fairebase}> 
+        <App />
+      </firebaseContexte.Provider>
+    </React.StrictMode>,
   document.getElementById('root')
 );

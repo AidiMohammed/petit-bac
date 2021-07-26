@@ -27,6 +27,9 @@ class Fairebase{
     //déconnexion
     signoutUser = () => this.auth.signOut();
 
+    //Récupération de mot de pass
+    passwordReset = email => this.auth.sendPasswordResetEmail(email);
+
 }
 
 export default Fairebase
