@@ -34,7 +34,15 @@ function Signup(props)
             firebase.user(user.user.uid).set({
                 username,
                 email,
-                contactes: []
+                contactes: [],
+                firstName: "",
+                lastName: "",
+                phoneNumber: "",
+                dateBirth: "",
+                invitationSents: [],
+                invitationReceived: [],
+                score: 0,
+
             })
             setUserInfo(initialState);
             props.history.push("/profile")

@@ -11,7 +11,8 @@ const firebaseConfig = {
     appId: "1:252981923118:web:3d68021f8e824ee5c0febf"
   };
 
-class Fairebase{
+class Fairebase
+{
     constructor()
     {
         firebase.initializeApp(firebaseConfig)
@@ -20,7 +21,6 @@ class Fairebase{
     }
 
     //inscription
-
     signupUser = (email,password) => this.auth.createUserWithEmailAndPassword(email,password)
     
     //Connexion
@@ -32,8 +32,11 @@ class Fairebase{
     //Récupération de mot de pass
     passwordReset = email => this.auth.sendPasswordResetEmail(email);
 
-    //user 
+    //user (doc)
     user = userid => this.db.doc(`users/${userid}`);
+
+    //users (collection)
+    users = () => this.db.collection(`users`);
 
 }
 

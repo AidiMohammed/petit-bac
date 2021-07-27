@@ -5,6 +5,7 @@ function Profile(props)
 {
     const [userSession, setUserSession] = useState(null)
     const [userData, setUserData] = useState({})
+    const [users, setUsers] = useState([])
 
     const firebase = useContext(firebaseContext)
     
@@ -14,6 +15,8 @@ function Profile(props)
             user ? setUserSession(user) : props.history.push('/login')
         })
 
+        console.log("USER SESSION :  ",userSession)
+
         if(!!userSession)
         {
             firebase.user(userSession.uid)
@@ -22,14 +25,27 @@ function Profile(props)
                 if(doc && doc.exists)
                     setUserData(doc.data())
             })
-            .catch(err => console.error(err.message))            
+            .catch(err => console.error(err.message))    
+            
+            firebase.users()
+            .get()
+            .then(users => setUsers(users.docs))
+            .catch(err => console.error(err.message))
         }
-
+        
+        
 
         return () => {
             listner()
         }
     }, [userSession])
+
+    const hadelSignout =() =>
+    {
+        firebase.signoutUser();
+        setUserSession(null);
+        setUserData(null);
+    } 
 
     return userSession === null ? 
     <Fragment>
@@ -37,9 +53,12 @@ function Profile(props)
     </Fragment>
     :
     <Fragment>
+        {console.log("USER DATA : ",userData)}
         <div> <h1>Profile</h1> <h4>Nom d'utilisateur : {userData.username}</h4> </div>
-
-        <button onClick= {() => firebase.signoutUser()} type="button">Se deconnecter</button>
+        <div>list des utilisateurs : 
+            {users.map(user => <h4>name : {user.data().username}</h4>)}
+        </div>
+        <button onClick= {() => hadelSignout()} type="button">Se deconnecter</button>
     </Fragment>
 }
 
