@@ -4,7 +4,7 @@ import firebaseContext from '../Firebase/context'
 function Profile(props) 
 {
     const [userSession, setUserSession] = useState(null)
-    const [userData, setUserData] = useState({})
+    const [userAuth, setUserAuth] = useState({})
     const [users, setUsers] = useState([])
     const [updateStatUsers, setUpdateStatUsers] = useState(false)
 
@@ -23,7 +23,7 @@ function Profile(props)
             .get()
             .then( doc => {
                 if(doc && doc.exists)
-                    setUserData(doc.data())
+                    setUserAuth(doc.data())
             })
             .catch(err => console.error(err.message))    
             
@@ -45,7 +45,7 @@ function Profile(props)
     {
         firebase.signoutUser();
         setUserSession(null);
-        setUserData(null);
+        setUserAuth(null);
     } 
 
     const AddToListInvitationSents = (user) =>
@@ -55,7 +55,7 @@ function Profile(props)
         .then(doc => 
             {
                 if(doc && doc.exists)
-                    setUserData(doc.data())
+                    setUserAuth(doc.data())
 
                 firebase.users()
                     .get()
@@ -68,39 +68,46 @@ function Profile(props)
         .catch(err => console.error(err.message))
 
         firebase.user(userSession.uid)//pour pointer sur user auth
-        .set({invitationSents: [...userData.invitationSents,user.id]},{ merge: true })//ajouter id de l'utilisateur à la liste d'invitation envoyée de user auth
-        .then(() => firebase.user(user.id)//pour pointer sur user sélectionner
-            .set({invitationReceived: [...user.data().invitationReceived,userSession.uid]},{merge: true})
-            .then(() => console.info("invitation envoyée avec succès"))
-            .catch(err => console.error(err.message))
-        )
+        .set({invitationSents: [...userAuth.invitationSents,user.id]},{ merge: true })//ajouter id de l'utilisateur à la liste d'invitation envoyée de user auth
+        .then(() => console.info("invitation envoyée avec succès"))
         .catch(err => console.log(err.message))
     }
 
     return userSession === null ? 
-    <Fragment>
-        <div>Loding ...</div>
-    </Fragment>
+    <div>Loding ...</div>
     :
     <Fragment>
-        <div> <h1>Profile</h1> <h4>Nom d'utilisateur : {userData.username}</h4> </div>
+        <div> <h1>Profile</h1> <h4>Nom d'utilisateur : {userAuth.username}</h4> </div>
         <div>list des utilisateurs : 
             {users.map((user,index) => 
             {
-                //forEach
-                console.log(`user auth ${userData.invitationSents} autre user ${user.data().invitationReceived}`)
                 if(user.id !== userSession.uid)
                     return (
-                    <Fragment key = {index}>
-                        <h4>name : {user.data().username}</h4>
-                        {
-                            user.data().invitationReceived.map(item => (item !== userSession.uid) ? <button onClick = {() => AddToListInvitationSents(user)}>Ajouter </button> : <h4>invitation envoyée</h4>)
-                            //user.data().invitationReceived.map(item => console.log(`ather user ${item} user auth ${userSession.uid}`))
-                            //console.log(user.data().invitationReceived.length)
-                        }
-                        {
-                            user.data().invitationReceived.length === 0 && <button onClick = {() => AddToListInvitationSents(user)}>Ajouter </button>
-                        }
+                    <Fragment key = {index} >
+                        <div style={{border: "1px solid red" ,display: "flex"}} className="user">
+                            <h4 >name : {`${user.data().username} `}</h4>
+                            {
+                                user.data().invitationSents.map((userid,index) => 
+                                {
+                                    if(userid === userSession.uid)
+                                        return <Fragment key={index}>{console.log("je suis la")}<button>Accépter</button> <button>Réfuser</button></Fragment>
+                                    if(userid !== userSession.uid)
+                                    {
+                                        userAuth.invitationSents.map(item => {
+                                            if(item === user.id)
+                                            {
+                                                console.log("je suis la (item) : ",item,"user id : ",user.id)
+                                                return <h1>invitation envoiyée</h1>
+                                            }
+                                                
+                                            else
+                                                return <button onClick = {() => AddToListInvitationSents(user)}>Ajouter !!</button>
+                                        })
+                                    }
+                                })
+                            }
+                            {(user.data().invitationSents.length === 0) && <button onClick = {() => AddToListInvitationSents(user)}>Ajouter !!</button>}
+                        </div>
                     </Fragment>)
             })}
         </div>
