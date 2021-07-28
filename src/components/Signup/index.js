@@ -57,6 +57,7 @@ function Signup(props)
                         dateBirth: "",
                         invitationSents: [],
                         invitationReceived: [],
+                        invitationAccepted: [],
                         score: 0,
                         onLine: true
                     })

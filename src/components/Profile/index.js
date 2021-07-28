@@ -6,6 +6,7 @@ function Profile(props)
     const [userSession, setUserSession] = useState(null)
     const [userData, setUserData] = useState({})
     const [users, setUsers] = useState([])
+    const [updateStatUsers, setUpdateStatUsers] = useState(false)
 
     const firebase = useContext(firebaseContext)
     
@@ -37,7 +38,7 @@ function Profile(props)
         return () => {
             listner()
         }
-    }, [userSession])
+    }, [userSession,updateStatUsers])
 
 
     const hadelSignout =() =>//ne pas oublier de mettre le champ "online" à false dans la base de donné
@@ -49,10 +50,30 @@ function Profile(props)
 
     const AddToListInvitationSents = (user) =>
     {
-        console.log(`user select : ${user.id} user auth id : ${userData}`);
         firebase.user(userSession.uid)
-        .set({invitationSents: [user.id]})
-        .then(() => console.log("***************"))
+        .get()
+        .then(doc => 
+            {
+                if(doc && doc.exists)
+                    setUserData(doc.data())
+
+                firebase.users()
+                    .get()
+                    .then(users => {
+                        setUsers(users.docs)
+                        setUpdateStatUsers(!updateStatUsers)
+                    } )
+                    .catch(err => console.error(err.message))
+            })
+        .catch(err => console.error(err.message))
+
+        firebase.user(userSession.uid)//pour pointer sur user auth
+        .set({invitationSents: [...userData.invitationSents,user.id]},{ merge: true })//ajouter id de l'utilisateur à la liste d'invitation envoyée de user auth
+        .then(() => firebase.user(user.id)//pour pointer sur user sélectionner
+            .set({invitationReceived: [...user.data().invitationReceived,userSession.uid]},{merge: true})
+            .then(() => console.info("invitation envoyée avec succès"))
+            .catch(err => console.error(err.message))
+        )
         .catch(err => console.log(err.message))
     }
 
@@ -66,12 +87,21 @@ function Profile(props)
         <div>list des utilisateurs : 
             {users.map((user,index) => 
             {
+                //forEach
+                console.log(`user auth ${userData.invitationSents} autre user ${user.data().invitationReceived}`)
                 if(user.id !== userSession.uid)
-                    return <Fragment key = {index}>
-                        {console.log(`user id ${user.id} auth id ${userSession.uid}`)}
+                    return (
+                    <Fragment key = {index}>
                         <h4>name : {user.data().username}</h4>
-                        <button onClick = {() => AddToListInvitationSents(user)}>Ajouter </button>
-                    </Fragment>
+                        {
+                            user.data().invitationReceived.map(item => (item !== userSession.uid) ? <button onClick = {() => AddToListInvitationSents(user)}>Ajouter </button> : <h4>invitation envoyée</h4>)
+                            //user.data().invitationReceived.map(item => console.log(`ather user ${item} user auth ${userSession.uid}`))
+                            //console.log(user.data().invitationReceived.length)
+                        }
+                        {
+                            user.data().invitationReceived.length === 0 && <button onClick = {() => AddToListInvitationSents(user)}>Ajouter </button>
+                        }
+                    </Fragment>)
             })}
         </div>
         <button onClick= {() => hadelSignout()} type="button">Se deconnecter</button>
