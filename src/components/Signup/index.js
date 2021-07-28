@@ -13,7 +13,8 @@ function Signup(props)
         confirmPassword: "",
         error: ""
     }
-    const [userInfo, setUserInfo] = useState(initialState)
+    const [userInfo, setUserInfo] = useState(initialState);
+    let userNameExiste = false
 
     const {username,email,password,confirmPassword,error} = userInfo
 
@@ -28,29 +29,45 @@ function Signup(props)
             setUserInfo({...userInfo,error: "Les mots de passe saisis ne sont pas identiques"});
             return;
         }
+        //console.log(users.docs[0].data()toUpperCase
+        firebase.users()
+        .get()
+        .then(users => 
+            {
+                users.docs.map(user => 
+                    {
+                        console.log("user name ************************",user.data().username.toUpperCase())
+                        if(user.data().username.toUpperCase() === username.toUpperCase())
+                        {
+                            userNameExiste = true;
+                            setUserInfo({...userInfo,error: `Ce nom d'utilisateur ${username} existe déjà ! veuillez choisir un autre nom d'utilisateur`});
+                        }  
+                    })
 
-        firebase.signupUser(email,password)
-        .then(user => {
-            firebase.user(user.user.uid).set({
-                username,
-                email,
-                contactes: [],
-                firstName: "",
-                lastName: "",
-                phoneNumber: "",
-                dateBirth: "",
-                invitationSents: [],
-                invitationReceived: [],
-                score: 0,
-
+                if(!userNameExiste)
+                firebase.signupUser(email,password)
+                .then(user => {
+                    firebase.user(user.user.uid).set({
+                        username,
+                        email,
+                        contactes: [],
+                        firstName: "",
+                        lastName: "",
+                        phoneNumber: "",
+                        dateBirth: "",
+                        invitationSents: [],
+                        invitationReceived: [],
+                        score: 0,
+                        onLine: true
+                    })
+                    setUserInfo(initialState);
+                    props.history.push("/profile")
+                })
+                .catch(err => {
+                    setUserInfo({...userInfo,error :`err (1) : ${err.message}`})
+                })      
             })
-            setUserInfo(initialState);
-            props.history.push("/profile")
-        })
-        .catch(err => {
-            setUserInfo({...userInfo,error :err.message})
-        })
-    
+        .catch(err => setUserInfo({...userInfo,error:`err (2) : ${err.message}`}))
     }
 
     const messageError = error && <h1>{error}</h1>

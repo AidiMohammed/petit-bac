@@ -37,7 +37,6 @@ class Fairebase
 
     //users (collection)
     users = () => this.db.collection(`users`);
-
 }
 
 export default Fairebase
