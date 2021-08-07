@@ -21,7 +21,7 @@ function Login(props)
         e.preventDefault()
         firebase.loginUser(email,password)
         .then(user => {
-            props.history.push("/profile")
+            props.history.push("/userSapce")
            // props.history.push("/test")
         })
         .catch(err => setInfoLogin({...infoLogin,error: err.message}))

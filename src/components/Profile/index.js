@@ -9,8 +9,10 @@ function Profile(props)
     const [openModal, setOpenModal] = useState(false);
     const firebase = useContext(firebaseContext);
 
-    useEffect(() => {
+    useEffect(() => 
+    {
         let authState = firebase.auth.onAuthStateChanged(user => user ? setUserSession(user) : props.history.push('/login'));
+
         if(!!userSession)
         {
             firebase.user(userSession.uid)
@@ -29,12 +31,14 @@ function Profile(props)
 
     return dataUserAuth === null ? 
         <Fragment>
-            <h1>loding ...</h1>
+            <h1>Chargement ...</h1>
         </Fragment>
         :
         <Fragment>
             <h2>profile</h2>
-            <p>nom d'utilisateur: {dataUserAuth.username}</p>
+            <p>nom d'utilisateur: {dataUserAuth.username}</p>{/*remplacer button par Link  'react router dom'*/}
+            <button onClick={() => props.history.push("/userSapce")}>Mon espace</button>
+            <br />
             <br />
             <button onClick={() => firebase.signoutUser()}>Se Déconnécter</button>
             <br />

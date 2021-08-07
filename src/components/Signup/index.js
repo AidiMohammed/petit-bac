@@ -32,7 +32,12 @@ function Signup(props)
        .then(doc => {
            if(doc && doc.exists)
            {
-               if(doc.data().usersnames.length === 0)
+            const usersnamesfromdb = Object.keys(doc.data().usersnames)
+            const usersID = Object.values(doc.data().usersnames)
+
+            console.log("user name from db : ",usersnamesfromdb.length)
+
+               if(usersnamesfromdb.length === 0)
                {
                    firebase.signupUser(email,password)
                    .then(user => {
@@ -51,10 +56,10 @@ function Signup(props)
                     })
                     .then(() => {
                         firebase.usersNames()
-                        .set({usersnames: [username]})
+                        .set({usersnames: {[username]: user.user.uid}})
                         .then(() => {
                             console.log("créer le premier utilisateur")
-                            props.history.push("/profile")
+                            props.history.push("/userSapce")
                             return;
                         })
                         .catch(err => {setUserInfo({...userInfo,error: err.message});return})
@@ -63,7 +68,8 @@ function Signup(props)
                    })
                    .catch(err => {setUserInfo({...userInfo,error: err.message});return})
                }
-               doc.data().usersnames.forEach(userName => 
+
+               usersnamesfromdb.forEach(userName => 
                 {
                     if(username.toUpperCase() === userName.toUpperCase())
                     {
@@ -91,10 +97,10 @@ function Signup(props)
                         })
                         .then(() => {
                             firebase.usersNames()
-                            .set({usersnames: [...doc.data().usersnames,username]})
+                            .set({usersnames: {...doc.data().usersnames,[username]: user.user.uid}})
                             .then(() => {
                                 console.log("créer un utilisateur");
-                                props.history.push("/profile")
+                                props.history.push("/userSapce")
                                 return;
                                 }).catch(err => setUserInfo({...userInfo,error: err.message}))
                         }).catch(err => setUserInfo({...userInfo,error: err.message}))
