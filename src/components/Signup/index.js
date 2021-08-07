@@ -9,64 +9,98 @@ function Signup(props)
     const initialState = {
         username: "",
         email: "",
-        password: "",
-        confirmPassword: "",
+        password: "123456",
+        confirmPassword: "123456",
         error: ""
     }
     const [userInfo, setUserInfo] = useState(initialState);
-    let userNameExiste = false
-
     const {username,email,password,confirmPassword,error} = userInfo
-
     const setInput = e => setUserInfo({...userInfo,[e.target.name]: e.target.value})
+
+    var userNameExist = false;
     
     const handelSubmit = e =>
     {
         e.preventDefault()
-
         if(password !== confirmPassword)
         {
             setUserInfo({...userInfo,error: "Les mots de passe saisis ne sont pas identiques"});
             return;
         }
-        //console.log(users.docs[0].data()toUpperCase
-        firebase.users()
-        .get()
-        .then(users => 
-            {
-                users.docs.map(user => 
-                    {
-                        console.log("user name ************************",user.data().username.toUpperCase())
-                        if(user.data().username.toUpperCase() === username.toUpperCase())
-                        {
-                            userNameExiste = true;
-                            setUserInfo({...userInfo,error: `Ce nom d'utilisateur ${username} existe déjà ! veuillez choisir un autre nom d'utilisateur`});
-                        }  
-                    })
-
-                if(!userNameExiste)
-                firebase.signupUser(email,password)
-                .then(user => {
-                    firebase.user(user.user.uid).set({
+       firebase.usersNames()
+       .get()
+       .then(doc => {
+           if(doc && doc.exists)
+           {
+               if(doc.data().usersnames.length === 0)
+               {
+                   firebase.signupUser(email,password)
+                   .then(user => {
+                    firebase.user(user.user.uid)
+                    .set({
                         username,
                         email,
-                        contactes: [],
-                        firstName: "",
-                        lastName: "",
-                        phoneNumber: "",
-                        dateBirth: "",
-                        invitationSents: [],
-                        score: 0,
-                        onLine: true
+                        firstname: "",
+                        lastname: "",
+                        phonemobile: "",
+                        listcontactes: [],
+                        blacklist: [],
+                        avatarpath: "",
+                        gender: "",
+                        datebirth: ""
                     })
-                    setUserInfo(initialState);
-                    props.history.push("/profile")
-                })
-                .catch(err => {
-                    setUserInfo({...userInfo,error :`err (1) : ${err.message}`})
-                })      
-            })
-        .catch(err => setUserInfo({...userInfo,error:`err (2) : ${err.message}`}))
+                    .then(() => {
+                        firebase.usersNames()
+                        .set({usersnames: [username]})
+                        .then(() => {
+                            console.log("créer le premier utilisateur")
+                            props.history.push("/profile")
+                            return;
+                        })
+                        .catch(err => {setUserInfo({...userInfo,error: err.message});return})
+                    })
+                    .catch(err => {setUserInfo({...userInfo,error: err.message});return})
+                   })
+                   .catch(err => {setUserInfo({...userInfo,error: err.message});return})
+               }
+               doc.data().usersnames.forEach(userName => 
+                {
+                    if(username.toUpperCase() === userName.toUpperCase())
+                    {
+                        setUserInfo({...userInfo,error: `le nom d'utilisateur existe déja voulez choisir un autre nom d'utulisateur`})
+                        userNameExist = true;
+                        return;
+                    }
+               });
+            
+               if(!userNameExist)
+                    firebase.signupUser(email,password)
+                    .then(user => {
+                        firebase.user(user.user.uid)
+                        .set({
+                                username,
+                                email,
+                                firstname: "",
+                                lastname: "",
+                                phonemobile: "",
+                                listcontactes: [],
+                                blacklist: [],
+                                avatarpath: "",
+                                gender: "",
+                                datebirth: ""
+                        })
+                        .then(() => {
+                            firebase.usersNames()
+                            .set({usersnames: [...doc.data().usersnames,username]})
+                            .then(() => {
+                                console.log("créer un utilisateur");
+                                props.history.push("/profile")
+                                return;
+                                }).catch(err => setUserInfo({...userInfo,error: err.message}))
+                        }).catch(err => setUserInfo({...userInfo,error: err.message}))
+                    }).catch(err => setUserInfo({...userInfo,error: err.message}))
+           }
+       })
     }
 
     const messageError = error && <h1>{error}</h1>

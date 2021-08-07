@@ -33,10 +33,10 @@ class Fairebase
     passwordReset = email => this.auth.sendPasswordResetEmail(email);
 
     //user (doc)
-    user = userid => this.db.doc(`users/${userid}`);
+    user = userid => this.db.collection("users").doc("allusers").collection("datausers").doc(userid);
 
-    //users (collection)
-    users = () => this.db.collection(`users`);
+    //users names (collection) users doc (allusers)
+    usersNames = () => this.db.collection(`users`).doc("allusers");
 }
 
 export default Fairebase

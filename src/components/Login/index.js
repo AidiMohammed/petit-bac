@@ -9,7 +9,7 @@ function Login(props)
 
     const initialState = {
         email: "",
-        password: "",
+        password: "123456",
         error: "" 
     }
     const [infoLogin, setInfoLogin] = useState(initialState);
@@ -22,6 +22,7 @@ function Login(props)
         firebase.loginUser(email,password)
         .then(user => {
             props.history.push("/profile")
+           // props.history.push("/test")
         })
         .catch(err => setInfoLogin({...infoLogin,error: err.message}))
     }

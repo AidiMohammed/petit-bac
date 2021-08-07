@@ -1,118 +1,73 @@
 import React,{useState,Fragment,useEffect,useContext} from 'react'
 import firebaseContext from '../Firebase/context'
+import ModalEditProfile from '../modals/modalEditProfile'
 
 function Profile(props) 
 {
-    const [userSession, setUserSession] = useState(null)
-    const [userAuth, setUserAuth] = useState({})
-    const [users, setUsers] = useState([])
-    const [updateStatUsers, setUpdateStatUsers] = useState(false)
+    const [userSession, setUserSession] = useState(null);
+    const [dataUserAuth, setDataUserAuth] = useState(null);
+    const [openModal, setOpenModal] = useState(false);
+    const firebase = useContext(firebaseContext);
 
-    const firebase = useContext(firebaseContext)
-    
     useEffect(() => {
-        let listner = firebase.auth.onAuthStateChanged(user => 
-        {
-            user ? setUserSession(user) : props.history.push('/login')
-            
-        })
-
+        let authState = firebase.auth.onAuthStateChanged(user => user ? setUserSession(user) : props.history.push('/login'));
         if(!!userSession)
         {
             firebase.user(userSession.uid)
             .get()
-            .then( doc => {
+            .then(doc => {
                 if(doc && doc.exists)
-                    setUserAuth(doc.data())
+                    setDataUserAuth(doc.data())
             })
-            .catch(err => console.error(err.message))    
-            
-            firebase.users()
-            .get()
-            .then(users => setUsers(users.docs))
-            .catch(err => console.error(err.message))
-
+            .catch()
         }
+        return () => authState();
+    }, [userSession])
+    
+    const hidenModalEditprofil = () => setOpenModal(false)
+    
 
-        //cleanup
-        return () => {
-            listner()
-        }
-    }, [userSession,updateStatUsers])
+    return dataUserAuth === null ? 
+        <Fragment>
+            <h1>loding ...</h1>
+        </Fragment>
+        :
+        <Fragment>
+            <h2>profile</h2>
+            <p>nom d'utilisateur: {dataUserAuth.username}</p>
+            <br />
+            <button onClick={() => firebase.signoutUser()}>Se Déconnécter</button>
+            <br />
+            <hr />
+            <label htmlFor="firstname">Prénom :</label>
+            <input type="text" name="firstname" id="firstname" value={dataUserAuth.firstname} disabled/>
+            <br />
+            <br />
+            <label htmlFor="lastname">Nom de famille :</label>
+            <input type="text" name="lastname" id="lastname" value={dataUserAuth.lastname} disabled/>
+            <br />
+            <br />
+            <label htmlFor="email">Email :</label>
+            <input type="text" name="email" id="email" value={dataUserAuth.email} disabled/>
+            <br />
+            <br />
+            <label htmlFor="phonemobile">Numéro de téléphone :</label>
+            <input type="text" name="phonemobile" id="phonemobile" value={dataUserAuth.phonemobile} disabled/>
+            <br />
+            <br />
+            <label htmlFor="gender">Gender :</label>
+            <input type="text" name="gender" id="gender" valus={dataUserAuth.gender} disabled/>
+            <br />
+            <br />
+            <label htmlFor="datebirth">Date de naissance :</label>
+            <input type="date" name="datebirth" id="datebirth" value={dataUserAuth.datebirth} disabled/>
+            <hr />
+            <br />
+            <button onClick={() => setOpenModal(true)}>Modifier mon profile</button>
 
-
-    const hadelSignout =() =>//ne pas oublier de mettre le champ "online" à false dans la base de donné
-    {
-        firebase.signoutUser();
-        setUserSession(null);
-        setUserAuth(null);
-    } 
-
-    const AddToListInvitationSents = (user) =>
-    {
-        firebase.user(userSession.uid)
-        .get()
-        .then(doc => 
-            {
-                if(doc && doc.exists)
-                    setUserAuth(doc.data())
-
-                firebase.users()
-                    .get()
-                    .then(users => {
-                        setUsers(users.docs)
-                        setUpdateStatUsers(!updateStatUsers)
-                    } )
-                    .catch(err => console.error(err.message))
-            })
-        .catch(err => console.error(err.message))
-
-        firebase.user(userSession.uid)//pour pointer sur user auth
-        .set({invitationSents: [...userAuth.invitationSents,user.id]},{ merge: true })//ajouter id de l'utilisateur à la liste d'invitation envoyée de user auth
-        .then(() => console.info("invitation envoyée avec succès"))
-        .catch(err => console.log(err.message))
-    }
-
-    return userSession === null ? 
-    <div>Loding ...</div>
-    :
-    <Fragment>
-        <div> <h1>Profile</h1> <h4>Nom d'utilisateur : {userAuth.username}</h4> </div>
-        <div>list des utilisateurs : 
-            {users.map((user,index) => 
-            {
-                if(user.id !== userSession.uid)
-                    return (
-                    <Fragment key = {index} >
-                        <div style={{border: "1px solid red" ,display: "flex"}} className="user">
-                            <h4 >name : {`${user.data().username} `}</h4>
-                            {
-                                user.data().invitationSents.map((userid,index) => 
-                                {
-                                    if(userid === userSession.uid)
-                                        return <Fragment key={index}>{console.log("je suis la")}<button>Accépter</button> <button>Réfuser</button></Fragment>
-                                    if(userid !== userSession.uid)
-                                    {
-                                        userAuth.invitationSents.map(item => {
-                                            if(item === user.id)
-                                            {
-                                                console.log("je suis la (item) : ",item,"user id : ",user.id)
-                                                return <h1>invitation envoiyée</h1>
-                                            }
-                                                
-                                            else
-                                                return <button onClick = {() => AddToListInvitationSents(user)}>Ajouter !!</button>
-                                        })
-                                    }
-                                })
-                            }
-                            {(user.data().invitationSents.length === 0) && <button onClick = {() => AddToListInvitationSents(user)}>Ajouter !!</button>}
-                        </div>
-                    </Fragment>)
-            })}
-        </div>
-        <button onClick= {() => hadelSignout()} type="button">Se deconnecter</button>
-    </Fragment>
+            <ModalEditProfile showModal ={openModal} hidenModal = {hidenModalEditprofil} userData = {dataUserAuth} userID = {userSession.uid}/>
+        </Fragment>
+    
 }
 
 export default Profile
