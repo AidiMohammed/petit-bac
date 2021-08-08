@@ -33,7 +33,7 @@ function UserSpace(props)
         </Fragment>
         :
         <Fragment>
-            <h2>Espace utilisateur</h2>
+            <h2>Espace utilisateur : {userAuth.username}</h2>
             <br />
             <hr />
             <button onClick={() => firebase.signoutUser()}>Se Déconnécter</button>
@@ -44,7 +44,7 @@ function UserSpace(props)
             <br />
             <button>Commencer une parti</button>
 
-            <FindUser showModelSearchUser={openModalSearchUser} hidenModal = {hidenModalSerachUser}/>
+            <FindUser showModelSearchUser={openModalSearchUser} hidenModal = {hidenModalSerachUser} userAuth={userAuth}/>
         </Fragment>
 
     

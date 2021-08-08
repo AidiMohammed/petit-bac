@@ -2,7 +2,7 @@ import React,{Fragment,useContext,useEffect,useState} from 'react'
 import {firebaseContexte} from '../../Firebase'
 import './findUser.css'
 
-function FindUser({showModelSearchUser,hidenModal}) 
+function FindUser({showModelSearchUser,hidenModal,userAuth}) 
 {
 
     const [stringSearch, setStringSearch] = useState("")
@@ -14,7 +14,7 @@ function FindUser({showModelSearchUser,hidenModal})
     var usersIDFromDatabasse = undefined;
 
     useEffect(() => {
-        console.log('use Effect')
+        console.log("user Auth name: ",userAuth.username)
         firebase.usersNames()
         .get()
         .then(doc => {
@@ -49,7 +49,7 @@ function FindUser({showModelSearchUser,hidenModal})
             <br /><br /><br /><hr />
             <ul>
                 {console.log("USERS : ",users)}
-                {users.map((user,index) => <li key={index}>{user} <button >Envoyer invitation</button></li>)}
+                {users.map((user,index) => <Fragment><li key={index}>{user} <button >Envoyer invitation</button></li><br /></Fragment>)}
             </ul>
         </Fragment>
     }

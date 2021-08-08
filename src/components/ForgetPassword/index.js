@@ -1,7 +1,7 @@
 import React,{Fragment,useState,useContext,useEffect} from 'react'
 import firebaseContext from '../Firebase/context';
 
-function ForgetPassword() 
+function ForgetPassword(props) 
 {
     const [state, setState] = useState({
         email: "",
@@ -40,10 +40,11 @@ function ForgetPassword()
         <form onSubmit = {e => submitForm(e)}>
 
             <label htmlFor="email">Email :</label>
-            <input value = {email} onChange = { e => setState({...state,email: e.target.value})} type="email" name= "email"/>
-
+            <input value = {email} onChange = { e => setState({...state,email: e.target.value})} type="email" name= "email" required/>
             <button type='submit'>Envoyer</button>
         </form>
+        <br /><br /><hr />
+        <button onClick={() => props.history.push("/userSapce")}>Se connecter </button>
     </Fragment>
      
 }

@@ -59,7 +59,7 @@ function Signup(props)
                         .set({usersnames: {[username]: user.user.uid}})
                         .then(() => {
                             console.log("créer le premier utilisateur")
-                            props.history.push("/userSapce")
+                            props.history.push("/userSpace")
                             return;
                         })
                         .catch(err => {setUserInfo({...userInfo,error: err.message});return})
@@ -100,7 +100,7 @@ function Signup(props)
                             .set({usersnames: {...doc.data().usersnames,[username]: user.user.uid}})
                             .then(() => {
                                 console.log("créer un utilisateur");
-                                props.history.push("/userSapce")
+                                props.history.push("/userSpace")
                                 return;
                                 }).catch(err => setUserInfo({...userInfo,error: err.message}))
                         }).catch(err => setUserInfo({...userInfo,error: err.message}))

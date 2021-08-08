@@ -37,7 +37,7 @@ function Profile(props)
         <Fragment>
             <h2>profile</h2>
             <p>nom d'utilisateur: {dataUserAuth.username}</p>{/*remplacer button par Link  'react router dom'*/}
-            <button onClick={() => props.history.push("/userSapce")}>Mon espace</button>
+            <button onClick={() => props.history.push("/userSpace")}>Mon espace</button>
             <br />
             <br />
             <button onClick={() => firebase.signoutUser()}>Se Déconnécter</button>

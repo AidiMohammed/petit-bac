@@ -1,4 +1,4 @@
-import React,{useState,useContext} from 'react';
+import React,{useState,useContext,useEffect} from 'react';
 import {firebaseContexte} from '../Firebase/'
 import {Link} from 'react-router-dom';
 
@@ -6,6 +6,12 @@ import {Link} from 'react-router-dom';
 function Login(props) 
 {
     const firebase = useContext(firebaseContexte)
+    
+
+    useEffect(() => {
+        let authState = firebase.auth.onAuthStateChanged(user => user &&  props.history.push('/userSpace'));
+        return () => authState()
+    }, [])
 
     const initialState = {
         email: "",
@@ -15,7 +21,7 @@ function Login(props)
     const [infoLogin, setInfoLogin] = useState(initialState);
 
     const {email,password,error} = infoLogin;
-
+    
     const submitForm = (e) =>
     {
         e.preventDefault()

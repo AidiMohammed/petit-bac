@@ -16,7 +16,7 @@ function App() {
           <Route exact path="/signup" component={Signup} />
           <Route exact path="/profile" component={Profile} />
           <Route exact path="/forgetPassword" component={ForgetPassword} />
-          <Route exact path="/userSapce" component={UserSpace} />
+          <Route exact path="/userSpace" component={UserSpace} />
         </Switch>
       </Router>
   );
