@@ -2,7 +2,7 @@ import React,{Fragment,useContext,useEffect,useState} from 'react'
 import {firebaseContexte} from '../../Firebase'
 import './findUser.css'
 
-function FindUser() 
+function FindUser({showModelSearchUser,hidenModal}) 
 {
 
     const [stringSearch, setStringSearch] = useState("")
@@ -48,24 +48,31 @@ function FindUser()
         return <Fragment>
             <br /><br /><br /><hr />
             <ul>
-                
                 {console.log("USERS : ",users)}
-                {users.map(user => <li>{user} <button>Envoyer invitation</button></li>)}
+                {users.map((user,index) => <li key={index}>{user} <button >Envoyer invitation</button></li>)}
             </ul>
         </Fragment>
     }
 
-    return (
+    const closeModal = () =>
+    {
+        setStringSearch("");
+        setUsersMatchStringSearch({})
+        hidenModal();
+    }
+
+    return showModelSearchUser &&
         <Fragment>
             <div className= "overlay">
                 <div className="warpper">
                     <h2>Search user </h2>
-                   <input type="search" name="searchUser" id="searchUser" value={stringSearch} onChange={e => startSearchString(e)}/>
+                    <input type="search" name="searchUser" id="searchUser" value={stringSearch} onChange={e => startSearchString(e)}/>
+                    <button onClick= {() => closeModal()}>Fermer</button>
                     {listUserMatch()}
                 </div>
             </div>
         </Fragment>
-    )
+    
 }
 
 export default FindUser

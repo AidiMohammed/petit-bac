@@ -7,6 +7,8 @@ function UserSpace(props)
     const firebase = useContext(firebaseContexte)
     const [userSession, setUserSession] = useState(null)
     const [userAuth, setUserAuth] = useState(null)
+    const [openModalSearchUser, setOpenModalSearchUser] = useState(false)
+
     useEffect(() => {
         const authState = firebase.auth.onAuthStateChanged(user => user ? setUserSession(user) : props.history.push('/login'));
 
@@ -23,6 +25,8 @@ function UserSpace(props)
         return () => authState()
     }, [userSession])
 
+    const hidenModalSerachUser = () => setOpenModalSearchUser(false)
+
     return userAuth === null ?
         <Fragment>
             <h1>Chargement ...</h1>
@@ -36,11 +40,11 @@ function UserSpace(props)
             <br /><br />
             <button onClick={() => props.history.push("/profile")}>Mon Profile</button>
             <br />
-            <button>Trouver des utilisateurs </button>
+            <button onClick={() => setOpenModalSearchUser(true)}>Trouver des utilisateurs </button>
             <br />
             <button>Commencer une parti</button>
 
-            <FindUser />
+            <FindUser showModelSearchUser={openModalSearchUser} hidenModal = {hidenModalSerachUser}/>
         </Fragment>
 
     
