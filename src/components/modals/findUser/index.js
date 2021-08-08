@@ -14,6 +14,7 @@ function FindUser()
     var usersIDFromDatabasse = undefined;
 
     useEffect(() => {
+        console.log('use Effect')
         firebase.usersNames()
         .get()
         .then(doc => {
@@ -21,10 +22,7 @@ function FindUser()
             {
                 usersNamesFromDatabasse = Object.keys(doc.data().usersnames)
                 usersIDFromDatabasse = Object.values(doc.data().usersnames)
-
                 setUsersFromDatabasse({usersNamesFromDatabasse,usersIDFromDatabasse})
-
-                console.log("user names from data basse : ",usersFromDatabasse," | ",usersNamesFromDatabasse)
             }
         })
     }, [])
@@ -33,14 +31,15 @@ function FindUser()
     {
         setStringSearch(e.target.value)
         setUsersMatchStringSearch({})
+        let usersMatch = {}
         
         usersFromDatabasse.usersNamesFromDatabasse.forEach((username,index) => 
         {
             if(stringSearch.length > 1)
-                if(username.includes(stringSearch))
-                    setUsersMatchStringSearch({...usersMatchStringSearch,[username]: usersFromDatabasse.usersIDFromDatabasse[index]})
-        })
-        console.log("user find : ",usersMatchStringSearch)
+                if(username.toUpperCase().includes(stringSearch.toUpperCase()))
+                    usersMatch= {...usersMatch,[username]: usersFromDatabasse.usersIDFromDatabasse[index]}
+         })
+        setUsersMatchStringSearch(usersMatch)
     }
 
     const listUserMatch = () =>
