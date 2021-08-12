@@ -28,7 +28,6 @@ function UserSpace(props)
                 {
                     doc.data().invitationReceived[user_id].map(item => 
                     {
-                        console.log(userSession.uid," | ",user_id)
                         if(user_id === userSession.uid)
                             setNotifications(true);
                     })
