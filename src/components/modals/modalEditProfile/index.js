@@ -43,8 +43,8 @@ function ModelEditProfile({showModal,hidenModal,userData,userID})
     }
     return showModal &&
         <Fragment>
-            <div className= "overlay">
-                <div className="warpper">
+            <div className= "overlay-edit-profile">
+                <div className="warpper-edit-profile">
                     <h2>Modifer profile</h2>
                     <button onClick={hidenModal}>Annuler</button>
                     <form onSubmit={e => handelSubmit(e)}>

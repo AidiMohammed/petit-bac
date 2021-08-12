@@ -44,7 +44,7 @@ function ForgetPassword(props)
             <button type='submit'>Envoyer</button>
         </form>
         <br /><br /><hr />
-        <button onClick={() => props.history.push("/userSapce")}>Se connecter </button>
+        <button onClick={() => props.history.push("/login")}>Se connecter </button>
     </Fragment>
      
 }

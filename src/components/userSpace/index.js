@@ -8,18 +8,32 @@ function UserSpace(props)
     const [userSession, setUserSession] = useState(null)
     const [userAuth, setUserAuth] = useState(null)
     const [openModalSearchUser, setOpenModalSearchUser] = useState(false)
+    const [notifications, setNotifications] = useState(false)  
 
     useEffect(() => {
         const authState = firebase.auth.onAuthStateChanged(user => user ? setUserSession(user) : props.history.push('/login'));
-
+              
         if(!!userSession)
         {
-           firebase.user(userSession.uid)
-           .get()
-           .then(doc =>{
+            firebase.user(userSession.uid)
+            .get()
+            .then(doc =>{
                if(doc && doc.exists)
                 setUserAuth(doc.data())
-           }).catch(err => console.log(err.message))
+            }).catch(err => console.log(err.message))
+
+            firebase.creatNotification('invitations').onSnapshot(doc => 
+            { 
+                for(let user_id in doc.data().invitationReceived)
+                {
+                    doc.data().invitationReceived[user_id].map(item => 
+                    {
+                        console.log(userSession.uid," | ",user_id)
+                        if(user_id === userSession.uid)
+                            setNotifications(true);
+                    })
+                }
+            })
         }
 
         return () => authState()
@@ -34,6 +48,7 @@ function UserSpace(props)
         :
         <Fragment>
             <h2>Espace utilisateur : {userAuth.username}</h2>
+            {notifications && <h3>Notification Alert </h3>}
             <br />
             <hr />
             <button onClick={() => firebase.signoutUser()}>Se Déconnécter</button>
@@ -44,7 +59,7 @@ function UserSpace(props)
             <br />
             <button>Commencer une parti</button>
 
-            <FindUser showModelSearchUser={openModalSearchUser} hidenModal = {hidenModalSerachUser} userAuth={userAuth}/>
+            <FindUser showModelSearchUser={openModalSearchUser} hidenModal = {hidenModalSerachUser} userAuth={userAuth} idUserAuth = {userSession.uid} />
         </Fragment>
 
     

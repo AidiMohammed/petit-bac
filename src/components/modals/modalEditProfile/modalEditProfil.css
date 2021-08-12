@@ -1,4 +1,4 @@
-.overlay {
+.overlay-edit-profile {
   background: rgba(0, 0, 0, 0.5);
   position: absolute;
   top: 0;
@@ -6,7 +6,7 @@
   right: 0;
   bottom: 0;
 }
-.warpper {
+.warpper-edit-profile {
   height: 500px;
   width: 700px;
   background: rgb(16, 97, 202);
