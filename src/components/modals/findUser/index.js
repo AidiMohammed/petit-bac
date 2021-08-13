@@ -29,8 +29,7 @@ function FindUser({showModelSearchUser,hidenModal,userAuth,idUserAuth})
         }).catch(err => console.error(err.messae))
 
         firebase.creatNotification("invitations")
-        .get()
-        .then((doc) => 
+        .onSnapshot((doc) => 
         {
             if(doc && doc.exists)
                 for(let user_id in doc.data().invitationReceived)

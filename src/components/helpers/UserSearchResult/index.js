@@ -1,4 +1,4 @@
-import React,{Fragment,useContext} from 'react'
+import React,{Fragment,useContext,useState,useEffect} from 'react'
 import {firebaseContexte} from "../../Firebase"
 
 function UserSearchResult({usersMatch,usersIssuingInvitations,usersMatchStringSearch,userAuth,idUserAuth}) 
@@ -6,6 +6,31 @@ function UserSearchResult({usersMatch,usersIssuingInvitations,usersMatchStringSe
     const firebase = useContext(firebaseContexte)
     const usersIdsMatching = Object.values(usersMatch)   
     const usersNamesMatching = Object.keys(usersMatch)
+    const [usersinvitationsReciveds, setUsersinvitationsReciveds] = useState({})
+
+    useEffect(() => 
+    {
+        firebase.creatNotification("invitations")
+        .get()
+        .then(doc => {
+            if(doc && doc.exists)
+            {
+                let correspandence = []
+                //console.log(usersMatch,doc.data().invitationReceived)    
+                for(let user_id in doc.data().invitationReceived)
+                {
+                    //console.log("user_id",user_id," | ",doc.data().invitationReceived[user_id])
+                    if(doc.data().invitationReceived[user_id].indexOf(idUserAuth) !== -1)
+                    {
+                        console.log(user_id)
+                        correspandence = [...correspandence,user_id]
+                    }
+                        
+                }
+                setUsersinvitationsReciveds(correspandence)
+            }
+        }) 
+    }, [usersMatch])
 
     const sendInvitation = (userNameReceivedInvitation,index) =>
     {
@@ -15,6 +40,7 @@ function UserSearchResult({usersMatch,usersIssuingInvitations,usersMatchStringSe
         .then(doc => {
             if(doc && doc.exists)
             {
+                
                 let createNewInvitationForUserReceivedInvitation = true;
                 if(Object.values(doc.data().invitationReceived).length === 0)//creat the first object
                 {
@@ -52,30 +78,36 @@ function UserSearchResult({usersMatch,usersIssuingInvitations,usersMatchStringSe
     }
 
     return <Fragment>
+        {console.log(usersinvitationsReciveds)}
         <ul style = {{border: "solid 1px red"}}>
             {
                 usersIdsMatching.map((user_id,index) => 
                 {
                     console.log(usersIssuingInvitations.length)
-                    if(usersIssuingInvitations.length > 0)
-                    {
-                     if(usersIssuingInvitations.indexOf(user_id) !== -1 )
-                        return  <li>
-                                    {usersNamesMatching[index]}
-                                    <button>Accépter invitation</button>
-                                    <button>Annuler invitation</button>
-                                </li>
-                    else
+                        if(usersIssuingInvitations.length > 0)
+                        {
+                            if(usersIssuingInvitations.indexOf(user_id) !== -1 )
+                                return  <li>
+                                            {usersNamesMatching[index]}
+                                            <button>Accépter invitation</button>
+                                            <button>Annuler invitation</button>
+                                        </li>
+                            if(usersinvitationsReciveds.indexOf(user_id) != -1)
+                                return  <li>
+                                            {usersNamesMatching[index]}
+                                            <button>Anuuler l'invitation</button>
+                                        </li>
+                            else
+                                return  <li>
+                                            {usersNamesMatching[index]}
+                                            <button onClick ={() => sendInvitation(user_id,index)}>Envoyer invitation</button>
+                                        </li>                       
+                        }
+                        else
                         return  <li>
                                     {usersNamesMatching[index]}
                                     <button onClick ={() => sendInvitation(user_id,index)}>Envoyer invitation</button>
-                                </li>                       
-                    }
-                    else
-                    return  <li>
-                                {usersNamesMatching[index]}
-                                <button onClick ={() => sendInvitation(user_id,index)}>Envoyer invitation</button>
-                            </li>      
+                                </li>      
                 })
             }
         </ul>

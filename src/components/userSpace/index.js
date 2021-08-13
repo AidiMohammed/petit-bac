@@ -8,7 +8,7 @@ function UserSpace(props)
     const [userSession, setUserSession] = useState(null)
     const [userAuth, setUserAuth] = useState(null)
     const [openModalSearchUser, setOpenModalSearchUser] = useState(false)
-    const [notifications, setNotifications] = useState(false)  
+    const [notifications, setNotifications] = useState({status: false,count: 0})  
 
     useEffect(() => {
         const authState = firebase.auth.onAuthStateChanged(user => user ? setUserSession(user) : props.history.push('/login'));
@@ -29,7 +29,11 @@ function UserSpace(props)
                     doc.data().invitationReceived[user_id].map(item => 
                     {
                         if(user_id === userSession.uid)
-                            setNotifications(true);
+                        {
+                            console.log("doc data() invitation Received ",doc.data().invitationReceived[user_id].length)
+                            setNotifications({status: true,count: doc.data().invitationReceived[user_id].length});
+                        }
+                            
                     })
                 }
             })
@@ -47,7 +51,7 @@ function UserSpace(props)
         :
         <Fragment>
             <h2>Espace utilisateur : {userAuth.username}</h2>
-            {notifications && <h3>Notification Alert </h3>}
+            {notifications.status && <h3>Notification Alert {notifications.count} </h3>}
             <br />
             <hr />
             <button onClick={() => firebase.signoutUser()}>Se Déconnécter</button>
